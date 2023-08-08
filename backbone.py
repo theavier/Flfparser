@@ -3,8 +3,11 @@ import requests
 import requests_cache
 import re
 from math import ceil
+from dateutil.parser import parse
 
-url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=Vandring&adventureTypes=Sn%C3%B6skor&adventureTypes=Vandring&counties=V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&organizers=&targetAudiences=&difficulties=&layout=banner"
+#url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=Vandring&adventureTypes=Sn%C3%B6skor&adventureTypes=Vandring&counties=V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&organizers=&targetAudiences=&difficulties=&layout=banner"
+url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=Vandring&adventureTypes=Sn%C3%B6skor#adventuretype#&counties=#county#&organizers=&targetAudiences=&difficulties=&layout=banner"
+baseurl = "https://www.friluftsframjandet.se"
 #url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=&counties=V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&organizers=&targetAudiences=&difficulties=&layout=banner"
 # https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/ # find categories
 
@@ -34,19 +37,35 @@ def get_page_count(url):
     return ceil(items_count/40) if items_count > 40 else 1
 
 
+def get_item_date(item):
+    item_date_raw = item.split("/")[-1]
+    try:
+        item_date = parse(item_date_raw, fuzzy=True) #.date() #.strftime("%Y-%m-%d")
+    except:
+        item_date = "N/A"
+    #print(f'original: {item_date_raw}, inpreted: {item_date}, type: {type(item_date)}')
+    return item_date
+
+
 def get_items(url):
     soup = get_soup(url)
     items = list()
-    for link in soup.find_all('div', class_='AdventureCard-content'):
+    result1 = soup.find_all('div', class_='AdventureCard-content')
+    result2 = soup.find_all('a', class_='AdventureCard-contentLink')
+    for i in range(len(result1)):
         item = {
-            "titel": link.find("h6", class_="AdventureCard-heading").text,
-            "description": link.find("p", class_="AdventureCard-description").text
+            "titel": result1[i].find("h6", class_="AdventureCard-heading").text,
+            "description": result1[i].find("p", class_="AdventureCard-description").text,
+            "href": baseurl+result2[i].get("href"),
+            "price": result2[i].find("span", class_="AdventureCard-price").text,
         }
+        #item["date"] = get_item_date(item['description'])
         items.append(item)
     return items
 
-#item_list = get_items(url)
-#print(item_list)
+
+item_list = get_items(url)
+print(item_list)
 
 def get_pages(current_url):
     for i in range(1, get_page_count(url)+1):
