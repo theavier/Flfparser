@@ -18,7 +18,7 @@ temp
 *.o
 *.so
 *.csv
-*.txt
+#*.txt
 *.json
 
 # Packages #
