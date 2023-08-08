@@ -1,11 +1,15 @@
 from bs4 import BeautifulSoup
 import requests
+import requests_cache
 import re
 from math import ceil
 
 url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=Vandring&adventureTypes=Sn%C3%B6skor&adventureTypes=Vandring&counties=V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&organizers=&targetAudiences=&difficulties=&layout=banner"
 #url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=&counties=V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&organizers=&targetAudiences=&difficulties=&layout=banner"
 # https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/ # find categories
+
+requests_cache.install_cache('github_cache', backend='sqlite', expire_after=250)
+
 
 def get_soup(url):
     headers = {
@@ -50,6 +54,6 @@ def get_pages(current_url):
         current_url = current_url.replace(f"&page={i}&", f"&page={i+1}&")
     return current_result
 
-output = get_pages(url)
-print(output)
-print(f'count: {len(output)}')
+#output = get_pages(url)
+#print(output)
+#print(f'count: {len(output)}')
