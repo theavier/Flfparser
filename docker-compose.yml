@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  web:
+    build:
+      context: flfparser/
+      dockerfile: Dockerfile
+    container_name: 'flfparser'
+    ports:
+      - 80:80
