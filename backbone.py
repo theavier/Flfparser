@@ -14,7 +14,8 @@ baseurl = "https://www.friluftsframjandet.se"
 requests_cache.install_cache('github_cache', backend='sqlite', expire_after=250)
 
 
-def get_soup(url):
+def get_soup(url: str) -> BeautifulSoup:
+    """ creates soup from url """
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
     html_content = requests.get(url, headers=headers).text
@@ -22,7 +23,8 @@ def get_soup(url):
     return soup
 
 
-def get_count(url):
+def get_count(url: str) -> int:
+    """ returns pagination from page """
     soup = get_soup(url)
     should_continue = soup.find('div', class_='Pagination__Wrap')
     if (should_continue):
@@ -32,12 +34,14 @@ def get_count(url):
         return None
 
 
-def get_page_count(url):
+def get_page_count(url: str) -> int:
+    """ returns page count based on items """
     items_count = get_count(url)
     return ceil(items_count/40) if items_count > 40 else 1
 
 
-def get_item_date(item):
+def get_item_date(item: str) -> str:
+    """ returns date based on partial date """
     item_date_raw = item.split("/")[-1]
     try:
         item_date = parse(item_date_raw, fuzzy=True) #.date() #.strftime("%Y-%m-%d")
@@ -47,7 +51,8 @@ def get_item_date(item):
     return item_date
 
 
-def get_items(url):
+def get_items(url: str) -> list:
+    """ returns dict in list with values from soup """
     soup = get_soup(url)
     items = list()
     result1 = soup.find_all('div', class_='AdventureCard-content')
@@ -64,10 +69,11 @@ def get_items(url):
     return items
 
 
-item_list = get_items(url)
-print(item_list)
+#item_list = get_items(url)
+#print(item_list)
 
-def get_pages(current_url):
+def get_pages(current_url: str) -> str:
+    """ loops content """
     for i in range(1, get_page_count(url)+1):
         current_result = get_items(current_url)
         current_url = current_url.replace(f"&page={i}&", f"&page={i+1}&")
