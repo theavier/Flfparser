@@ -6,7 +6,8 @@ from math import ceil
 from dateutil.parser import parse
 
 #url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=Vandring&adventureTypes=Sn%C3%B6skor&adventureTypes=Vandring&counties=V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&organizers=&targetAudiences=&difficulties=&layout=banner"
-url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=Vandring&adventureTypes=Sn%C3%B6skor#adventuretype#&counties=#county#&organizers=&targetAudiences=&difficulties=&layout=banner"
+#url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=Vandring&adventureTypes=Sn%C3%B6skor#adventuretype#&counties=#county#&organizers=&targetAudiences=&difficulties=&layout=banner"
+url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&#adventuretype#&counties=#county#&organizers=&targetAudiences=&difficulties=&layout=banner"
 baseurl = "https://www.friluftsframjandet.se"
 #url = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=&counties=V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&organizers=&targetAudiences=&difficulties=&layout=banner"
 # https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/ # find categories
@@ -19,7 +20,8 @@ def get_soup(url: str) -> BeautifulSoup:
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"}
     html_content = requests.get(url, headers=headers).text
-    soup = BeautifulSoup(html_content, "lxml")
+    #soup = BeautifulSoup(html_content, "lxml")
+    soup = BeautifulSoup(html_content, "html.parser")
     return soup
 
 
@@ -82,3 +84,16 @@ def get_pages(current_url: str) -> str:
 #output = get_pages(url)
 #print(output)
 #print(f'count: {len(output)}')
+
+# get adventure type
+def get_adventuretype():
+    soup = get_soup(baseurl)
+    #result1 = soup.find_all('div', class_='HeadingGroup')
+    result1 = soup.find_all('div', class_="option")
+    result1 = soup.find_all("div", {"class": "option"})
+    #result1 = soup.select_one(".Form_AdventureArea")
+    #id Form_AdventureArea #option
+    
+    return result1
+
+#print(get_adventuretype())
