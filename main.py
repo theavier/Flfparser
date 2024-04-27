@@ -1,9 +1,8 @@
 from fastapi import FastAPI, Response, Query
-from backbone import get_pages, url
+from backbone import get_pages, set_url_basic
 from back_rss import create_rss
-#from typing import List
 from typing import Annotated
-
+from urllib.parse import unquote
 
 app = FastAPI()
 
@@ -12,15 +11,13 @@ app = FastAPI()
 async def root():
     return {"message": "Rss getter"}
 
-# hur får jag in en eller flera params som
-# &adventureTypes=Friluftskunskap&adventureTypes=Allemansrätt&adventureTypes=Djur%20och%20natur&adventureTypes=Första%20hjälpen&adventureTypes=Kris%20och%20säkerhet&adventureTypes=Ledarskap&adventureTypes=Meteorologi&adventureTypes=Navigation
+
 @app.get("/get")
 def query(county: str = "Västra%20Götalands%20län", adventuretype: Annotated[list[str] | None, Query()] = None):
-    all_adventures = "&".join([f'adventuretype={i}' for i in adventuretype])
-    new_url = url.replace('#county#', county).replace('#adventuretype#', all_adventures)    
-    #print(f'url {new_url}')
-    results = get_pages(new_url)
-    rss = create_rss(results, title="Friluftsfrämjandet VGL RSS", desc="Vandringar")
+    """ retrieves adventures
+    example http://localhost:7000/get?adventuretype=vandring&adventuretype=ledarskap """
+    results = get_pages(set_url_basic(county=county, _at_list=adventuretype))
+    rss = create_rss(results, title=f"Friluftsfrämjandet {unquote(county)} RSS", desc=",".join(adventuretype))
     return Response(content=rss, media_type="application/xml")
 
 @app.get("/generate")
@@ -30,4 +27,4 @@ def gen() -> Response:
     return {"message" : "generate"}
 
 # to test api run
-# uvicorn main:app --reload
+# uvicorn main:app --reload --port 7000
