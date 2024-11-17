@@ -132,6 +132,7 @@ def get_adventuretype():
     soup = get_soup(baseurl)
     #result1 = soup.find_all('div', class_='HeadingGroup')
     adventures = soup.select('select#Form_AdventureArea > option')
+    print(f'adventuretypes= {adventures}')
     return [i['value'] for i in adventures if (i['value']).strip()]
 #print(get_adventuretype())
 
