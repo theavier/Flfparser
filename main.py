@@ -13,13 +13,24 @@ async def root():
 
 
 @app.get("/get")
-def query(county: str = "Västra%20Götalands%20län", adventuretype: Annotated[list[str] | None, Query()] = None):
+#def main_query(county: str = "Västra%20Götalands%20län", adventuretype: Annotated[list[str] | None, Query()] = None):
+def main_query(county: str = "Västra%20Götalands%20län", advtype: Annotated[list[str] | None, Query()] = None):
     """ retrieves adventures
     example http://localhost:7000/get?adventuretype=vandring&adventuretype=ledarskap """
+    # TODO 2 fix space not handled in adventuretype
+    print(f'inital value: {advtype}')
+    if not advtype:
+        print(f'advtype empty, setting default...')
+        advtype = ['vandring']
+    print(f'init adventuretype {advtype}, type {type(advtype)}, count {len(advtype)}')  
     print(f'counties: {county}')
-    print(f'adventuretypes: {adventuretype}')
-    results = get_pages(set_url_basic(_county=county, _at_list=adventuretype))
-    rss = create_rss(results, title=f"Friluftsfrämjandet {unquote(county)} RSS", desc=",".join(adventuretype))
+    print(f'adventuretypes: {advtype}')
+    print(f'Step 2 Getting result')
+    results = get_pages(set_url_basic(_county=county, _at_list=advtype))
+    print(f'type: {type(advtype)}')
+    #rss_desc = ",".join(adventuretype) if isinstance(adventuretype, list) else adventuretype
+    #print(f"rss_desc= {rss_desc}")
+    rss = create_rss(results, title=f"Friluftsfrämjandet {unquote(county)} RSS", desc=",".join(advtype))
     return Response(content=rss, media_type="application/xml")
 
 @app.get("/generate")

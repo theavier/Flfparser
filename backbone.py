@@ -5,6 +5,7 @@ from requests.models import PreparedRequest
 import re
 from math import ceil
 from dateutil.parser import parse
+from urllib.parse import unquote, quote, urlparse
 
 url =    "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&#adventuretype#&counties=#county#&organizers=&targetAudiences=&difficulties=&layout=banner"
 urladv = "https://www.friluftsframjandet.se/lat-aventyret-borja/hitta-aventyr/?showFullBookings=false&showClosedRegistration=false&filterBy=&startDate=null&endDate=null&query=&sortBy=&page=1&adventureTypes=Kanadensare&counties=&organizers=&targetAudiences=&difficulties=&layout=banner"
@@ -46,9 +47,15 @@ def set_url(_url: str = url_query, _params: dict = start_params, _at_list: str =
 #print(set_url(url_query, start_params))
 
 def set_url_basic( _county: str, _url: str= url, _at_list= ['vandring']) -> str:
-    print(f'_at_list={_at_list}')
-    return _url.replace('#county#', _county).replace('#adventuretype#',
-                                                     "&".join([f'adventuretype={i}' for i in _at_list]))
+    print(f'initial _at_list={_at_list}')
+    return _url.replace('#county#', set_url_encode(_county)).replace('#adventuretype#',
+                                                     "&".join([f'adventuretypes={i}' for i in set_url_encode(_at_list)]))
+
+def set_url_encode(_at_list):
+    if isinstance(_at_list, list):
+        return [quote(i, encoding='utf-8') for i in _at_list]
+    if isinstance(_at_list, str):
+        return quote(_at_list, encoding='utf-8')
 
 def get_soup(url: str) -> BeautifulSoup:
     """ creates soup from url """
