@@ -2,7 +2,7 @@ feedparser
 requests
 beautifulsoup4
 lxml
-fastapi==0.63.0
+fastapi==0.115.5
 uvicorn==0.13.4
 rfeed
 requests-cache
